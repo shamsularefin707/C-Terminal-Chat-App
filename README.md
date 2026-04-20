@@ -38,7 +38,7 @@ This project was developed as a "Pair Programming" exercise with significant ass
 4. Start Client: `./client`
 
 ## 🎓 Academic Context
-Developed as a Lab Final Project for BSSE (Roll 1732). This project served as a practical deep-dive into Operating Systems (Concurrency) and Networking fundamentals before my formal academic coursework.
+Developed as a Lab Final Project of 1-1 for BSSE (Roll 1732). This project served as a practical deep-dive into Operating Systems (Concurrency) and Networking fundamentals before my formal academic coursework.
 
 ---
 **Author:** Md. Shamsul Arefin (shamsularefin707)
