@@ -20,7 +20,7 @@ A high-performance, multi-threaded chat application developed in C. This project
 * **Build Tool:** Makefile included for easy compilation.
 
 ## 🤖 AI Assistance & Transparency
-This project was developed as a "Pair Programming" exercise with significant assistance from AI (Gemini/ChatGPT). 
+This project was developed as a "Pair Programming" exercise with significant assistance from AI (Gemini). 
 
 **My Role (Lead Developer):**
 * **Architecture Design:** Defined the requirements for the three-panel layout and the logic for private messaging.
