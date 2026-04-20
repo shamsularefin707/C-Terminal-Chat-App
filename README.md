@@ -1,69 +1,44 @@
-# C Terminal Chat Application
+# 💬 Terminal-Based Concurrent Chat System (C)
 
-This is a robust, multi-client terminal-based chat application written in C. It uses `ncurses` for a feature-rich client UI, `pthreads` for concurrent client handling, and a line-based network protocol for stable communication.
+A high-performance, multi-threaded chat application developed in C. This project features a sophisticated `ncurses` terminal UI, robust socket communication, and thread synchronization to handle multiple concurrent users.
 
-The application supports real-time chat, private messaging, persistent history, a live user list, and many advanced UI features.
+![Chat App Preview](image_4af3fd.png)
+![User Interface](image_4af77f.png)
 
-## Features
+## ✨ Core Features
+* **Ncurses TUI:** Three-panel layout (User List, Chat Logs, Input Field) with real-time scrolling and color support.
+* **Concurrency:** Implements a **Thread-per-Client** model using `pthreads`.
+* **Socket Programming:** Uses TCP/IP (`SOCK_STREAM`) for reliable data delivery.
+* **Privacy Controls:** Supports global broadcasts and private messaging via `@username`.
+* **Smart History:** Server logs chat history but filters private messages so only intended recipients see them.
+* **Auto-Shutdown:** Server detects idle states and shuts down gracefully when the last user leaves.
 
-* **Multi-Client Server**: Handles multiple simultaneous client connections using `pthreads`.
-* **Auto-Shutdown Server**: The server automatically detects when the last client has disconnected and shuts itself down.
-* **Ncurses UI**: The client features a three-panel layout (Users, Chat History, Input) that is fully thread-safe and robust against window resizing.
-* **Persistent & Private History**: The server logs all public and private messages. New users receive the *public* chat history, but *private* messages are only shown to the sender and recipient, ensuring privacy.
-* **User & Private Messaging**: Users can send public messages to all clients or send a private message to a specific user using the `@username <message>` syntax.
-* **Live User List**: The "Users" panel updates in real-time. Your own username is highlighted in **green** so you can easily identify yourself.
-* **Per-User Colors**: Each user is automatically assigned one of 6 distinct colors (Red, Green, Yellow, Blue, Magenta, Cyan). All their public and private messages appear in their assigned color, making the chat easy to follow.
-* **History Scrolling**: You can use the **Arrow Up** and **Arrow Down** keys to scroll through the entire chat history without interrupting your typing or corrupting the display.
-* **Robust Input & Network**:
-    * **Stable Input**: The client uses a manual `wgetch` loop to handle typing, backspace, and arrow keys, while safely ignoring disruptive mouse wheel clicks or blank "Enter" presses.
-    * **Stable Network**: The server and client use a line-based protocol (messages ending in `\n`). This "message framing" prevents network packets from "sticking together" and ensures that messages are never jumbled.
+## 🛠️ Technical Details
+* **Language:** C99
+* **Threading:** `pthread_mutex_t` used to prevent race conditions during client list updates and log writing.
+* **Networking:** Wrapped `FILE*` streams over sockets for stable, line-buffered communication.
+* **Build Tool:** Makefile included for easy compilation.
 
-## Files
+## 🤖 AI Assistance & Transparency
+This project was developed as a "Pair Programming" exercise with significant assistance from AI (Gemini/ChatGPT). 
 
-* `server.c`: The multi-threaded server application. Manages clients, assigns colors, routes messages, and filters/serves chat history.
-* `client.c`: The client application. Provides the advanced `ncurses` UI, including the scrollable "pad" for history and the manual input loop.
-* `net_helper.c`: A helper library providing simplified functions for socket creation, connection, and I/O, including the `Connection` struct.
-* `Makefile`: For easy compilation of the server and client.
+**My Role (Lead Developer):**
+* **Architecture Design:** Defined the requirements for the three-panel layout and the logic for private messaging.
+* **Project Management:** Structured the multi-file project, managed the `Makefile`, and handled the compilation/debugging process in a Linux environment.
+* **Integration:** Manually resolved threading conflicts and ensured `ncurses` worked harmoniously with the networking backend.
 
-## Compilation
+**AI's Role (Co-Pilot):**
+* **Implementation:** Assisted in generating roughly 95% of the codebase, specifically the low-level socket handling and the complex `ncurses` pad scrolling logic.
+* **Problem Solving:** Used to explore advanced C concepts such as mutex locking and stream duplication (`dup()`).
 
-A `Makefile` is provided for easy compilation.
+## 🚀 How to Run
+1. Clone the repo: `git clone https://github.com/shamsularefin707/C-Terminal-Chat-App.git`
+2. Compile: `make`
+3. Start Server: `./server`
+4. Start Client: `./client`
 
-1.  **To build both the server and client:**
-    ```bash
-    make all
-    ```
-    (or just `make`)
+## 🎓 Academic Context
+Developed as a Lab Final Project for BSSE (Roll 1732). This project served as a practical deep-dive into Operating Systems (Concurrency) and Networking fundamentals before my formal academic coursework.
 
-2.  **To clean up build files and the log:**
-    ```bash
-    make clean
-    ```
-
-## How to Use
-
-1.  **Start the Server:**
-    First, run the server in a terminal. It will automatically listen on `127.0.0.5` at port `9000`.
-    ```bash
-    ./server
-    ```
-    The server will print `Server listening on port 9000...`
-
-2.  **Start the Client(s):**
-    Open one or more new terminal windows and run the client.
-    ```bash
-    ./client
-    ```
-
-3.  **Log In:**
-    The client will first ask you for a username in the terminal *before* the UI starts.
-    ```
-    Enter your username: Arefin
-    ```
-    If the username is valid, the `ncurses` UI will launch.
-
-4.  **Chatting:**
-    * **Public Chat:** Type any message and press Enter.
-    * **Private Chat:** To send a private message, use the `@username` syntax.
-    * **Scroll History:** Use the **Arrow Up** and **Arrow Down** keys.
-    * **Quit:** To disconnect and close the client, type `:q` and press Enter.
+---
+**Author:** Md. Shamsul Arefin (shamsularefin707)
