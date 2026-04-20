@@ -2,8 +2,15 @@
 
 A high-performance, multi-threaded chat application developed in C. This project features a sophisticated `ncurses` terminal UI, robust socket communication, and thread synchronization to handle multiple concurrent users.
 
-![Chat App Preview](image_4af3fd.png)
-![User Interface](image_4af77f.png)
+## 📸 Project Screenshots
+<p align="center">
+  <img src="sc1.png" width="45%" />
+  <img src="sc2.png" width="45%" /> 
+</p>
+<p align="center">
+  <img src="sc3.png" width="45%" />
+  <img src="sc4.png" width="45%" />
+</p>
 
 ## ✨ Core Features
 * **Ncurses TUI:** Three-panel layout (User List, Chat Logs, Input Field) with real-time scrolling and color support.
