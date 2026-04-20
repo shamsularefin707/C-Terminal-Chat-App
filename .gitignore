@@ -1,0 +1,11 @@
+# Compiled Binaries
+server
+client
+*.o
+*.out
+
+# Logs and temp files
+*.log
+
+# OS generated files
+.DS_Store
