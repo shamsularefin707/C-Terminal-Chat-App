@@ -1,0 +1,69 @@
+Terminal-Based Concurrent Chat Application Report
+
+Name: Md. Shamsul Arefin
+Roll: BSSE 1732
+Date: 12.11.25
+
+1. Introduction and Objectives
+
+This project involves the development of a terminal-based chat system using the C programming language. The primary goal was to demonstrate fundamental concepts of operating systems and computer networking—particularly concurrency, inter-process communication (IPC) through sockets, and thread synchronization.
+
+The system implements a fully functional real-time communication platform that operates entirely in the command line, providing an intuitive interface using the `ncurses` library. It supports multiple concurrent users, ensures stable, synchronized communication, and provides advanced features like persistent history with privacy.
+
+2. Server Design and Concurrency (Pointer Usage & Dynamic Memory)
+
+The server architecture follows a **thread-per-client** model to achieve high concurrency. This approach allows the system to handle multiple simultaneous users efficiently without blocking I/O operations.
+
+2.1 Concurrency Mechanism (`pthreads`)
+
+The main function in `server.c` initializes a listening socket and continuously waits for incoming connections. Each time a new connection is accepted (`listener_accept`), a dedicated thread is spawned using `pthread_create` to manage that client. Each client thread executes the `client_handler` function, isolating its logic from all other clients.
+
+2.2 Pointer Usage and Dynamic Memory
+
+This concurrent model relies heavily on pointers and dynamic memory. We manage clients using a global array of pointers: `Connection *client_list[MAX_CLIENTS]`.
+
+When a new client connects, the `net_helper.c` library dynamically allocates memory for their `Connection` struct on the heap using `malloc`. This is crucial because the `Connection` object must persist for the entire duration of the client's session, independent of the main thread's stack.
+
+A pointer to this new object is then passed to the client's dedicated thread and also stored in the global `client_list`. All string parsing (such as for private messages) is done using pointer-based C library functions like `strchr`, `strtok`, and `sscanf`. When a client disconnects, `conn_close` is called, which in turn calls `free` on the `Connection` object, ensuring no memory leaks occur.
+
+3. ncurses Interface and Synchronization
+
+The client-side UI is built with `ncurses` and is designed for robustness, advanced features, and complete thread-safety.
+
+3.1 Thread Safety (Mutex)
+
+A key challenge in the client design is that two threads (the main input thread and the `receiver_func` thread) can both try to write to the screen at the same time. This creates a classic race condition, which would corrupt the UI.
+
+We solve this by using a single global mutex: `pthread_mutex_t ncurses_mutex`. All `ncurses` drawing and refresh functions (like `wprintw`, `wrefresh`, `prefresh`) in *both* threads are strictly wrapped in `pthread_mutex_lock` and `pthread_mutex_unlock` calls. This guarantees that only one thread can access the screen at a time, preventing all UI corruption and jumbling.
+
+3.2 Advanced Scrolling (ncurses Pad)
+
+To provide a stable, fully scrollable chat history, we implemented an `ncurses` "pad". This is a large, virtual window (`history_pad`) that stores up to 2,000 lines of history. The user's on-screen "Chat History" window is merely a small "viewport" looking at this pad.
+
+When the user presses `KEY_UP` or `KEY_DOWN`, we simply increment or decrement an integer (`pad_origin`) and call `prefresh` to re-render the viewport from that new origin. This method is non-destructive, fixes all scrolling-related bugs, and provides a smooth, professional user experience.
+
+4. Message Handling and Protocol
+
+The system uses a robust, line-based text protocol to ensure stable communication.
+
+4.1 Protocol Design (Line-Based)
+
+To solve the classic network bug of "jumbled messages" (where two messages arrive in a single `read` call), we wrap the socket's file descriptor in a `FILE*` stream using `fdopen`.
+
+This allows us to use `fprintf` (to send) and `fgets` (to receive). Because `fprintf` is buffered, we must manually call `fflush(srv_stream_write)` after sending a message to prevent deadlocks. On the receiving end, `fgets` guarantees that we read one full, newline-terminated command at a time. This line-based approach is the key to the application's network stability.
+
+4.2 Group (User) and Private Handling
+
+The client formats messages based on user input:
+User (Group): Default messages are formatted as `USER:message\n`.
+Private	    : Messages starting with `@` are formatted as `PRIVATE:recipient:message\n`.
+
+The server's `client_handler` parses this command. For `USER:` messages, it calls `broadcast_message()`, which loops through the `client_list` of pointers and sends the message to every client. For `PRIVATE:` messages, it calls `send_private_message()`, which finds the *specific* recipient's `Connection` pointer and sends the message only to them.
+
+4.3 History Privacy
+
+This privacy model is extended to the chat history. The `send_history_to_client` function on the server reads the `chat_history.log` file but intelligently filters it. It sends all public `[User]` messages, but it will only send `[Private]` messages if the new user's username matches either the sender or the recipient listed in the log.
+
+5. Conclusion
+
+This project successfully integrates core concepts from operating systems, networking, and UI programming. By leveraging `pthreads` for concurrency, socket communication wrapped in `FILE*` streams for stability, and an advanced `ncurses` pad implementation, we built a scalable and robust real-time chat application. The use of mutexes ensures thread safety on both the client and server, fulfilling all project objectives.
